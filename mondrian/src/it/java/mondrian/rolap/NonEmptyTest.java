@@ -11,16 +11,7 @@
 package mondrian.rolap;
 
 import junit.framework.Assert;
-import mondrian.olap.Axis;
-import mondrian.olap.Cell;
-import mondrian.olap.Connection;
-import mondrian.olap.Evaluator;
-import mondrian.olap.Id;
-import mondrian.olap.Level;
-import mondrian.olap.Member;
-import mondrian.olap.MondrianProperties;
-import mondrian.olap.NativeEvaluationUnsupportedException;
-import mondrian.olap.Result;
+import mondrian.olap.*;
 import mondrian.rolap.RolapConnection.NonEmptyResult;
 import mondrian.rolap.RolapNative.Listener;
 import mondrian.rolap.RolapNative.NativeEvent;

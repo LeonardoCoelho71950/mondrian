@@ -57,6 +57,17 @@ maximum size of a result set.
         <Type>int</Type>
         <Default>0</Default>
     </PropertyDefinition>
+	<PropertyDefinition>
+        <Name>ResultLimitMode</Name>
+        <Path>mondrian.result.limitMode</Path>
+        <Description>
+Property that specifies whether or not to preventive check the result limit.
+
+<p>Valid values are "IGNORE", "WARN" (the default) and "FAIL".</p>
+        </Description>
+        <Type>String</Type>
+        <Default>WARN</Default>
+    </PropertyDefinition>
     <PropertyDefinition>
         <Name>HighCardChunkSize</Name>
         <Path>mondrian.result.highCardChunkSize</Path>

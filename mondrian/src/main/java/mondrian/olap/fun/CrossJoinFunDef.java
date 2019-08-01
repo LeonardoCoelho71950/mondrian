@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2002-2005 Julian Hyde
-// Copyright (C) 2005-2017 Hitachi Vantara and others
+// Copyright (C) 2005-2019 Hitachi Vantara and others
 // All Rights Reserved.
 */
 package mondrian.olap.fun;
@@ -365,7 +365,15 @@ public class CrossJoinFunDef extends FunDefBase {
             ListCalc listCalc2 = (ListCalc) calcs[1];
 
             TupleList l1 = listCalc1.evaluateList(evaluator);
+            // check if first list size already exceeds limit
+            Util.preventiveCheckCJResultLimit(l1.size());
+
             TupleList l2 = listCalc2.evaluateList(evaluator);
+            // check if second list size already exceeds limit
+            Util.preventiveCheckCJResultLimit(l2.size());
+
+            // check crossjoin
+            Util.preventiveCheckCJResultLimit(l1.size() * l2.size());
 
             l1 = nonEmptyOptimizeList(evaluator, l1, call);
             if (l1.isEmpty()) {

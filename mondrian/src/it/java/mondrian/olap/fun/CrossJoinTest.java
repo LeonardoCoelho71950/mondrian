@@ -99,6 +99,7 @@ public class CrossJoinTest extends FoodMartTestCase {
             crossJoinFunDef.new CrossJoinIterCalc(getResolvedFunCall(), null);
 
         doTupleTupleIterTest(calc, excMock);
+        doTupleTupleIterTestWithResultLimit(calc, excMock);
       }
     }
 
@@ -127,6 +128,42 @@ public class CrossJoinTest extends FoodMartTestCase {
           "{[U, V, k, l], [U, V, m, n], [W, X, k, l], "
           + "[W, X, m, n], [Y, Z, k, l], [Y, Z, m, n]}";
       Assert.assertEquals(e, s);
+    }
+
+    private void doTupleTupleIterTestWithResultLimit(
+            CrossJoinFunDef.CrossJoinIterCalc calc, Execution execution)
+    {
+        String oldResultLimitMode = MondrianProperties.instance().ResultLimitMode.get();
+        int oldResultLimit = MondrianProperties.instance().ResultLimit.get();
+
+        MondrianProperties.instance().ResultLimitMode.set("FAIL");
+        MondrianProperties.instance().ResultLimit.set(2);
+
+        TupleList l4 = makeListTuple(m4);
+        String s4 = toString(l4);
+        String e4 = "{[U, V], [W, X], [Y, Z]}";
+        Assert.assertEquals(e4, s4);
+
+        TupleList l3 = makeListTuple(m3);
+        String s3 = toString(l3);
+        String e3 = "{[k, l], [m, n]}";
+        Assert.assertEquals(e3, s3);
+
+        String s = Locus.execute(
+                execution, "CrossJoinTest", new Locus.Action<String>()
+                {
+                    public String execute() {
+                        TupleIterable iterable = calc.makeIterable(l4, l3);
+                        return CrossJoinTest.this.toString(iterable);
+                    }
+                });
+        String e =
+                "{[U, V, k, l], [U, V, m, n], [W, X, k, l], "
+                        + "[W, X, m, n], [Y, Z, k, l], [Y, Z, m, n]}";
+        Assert.assertEquals(e, s);
+
+        MondrianProperties.instance().ResultLimitMode.set(oldResultLimitMode);
+        MondrianProperties.instance().ResultLimit.set(oldResultLimit);
     }
 
     // The test to verify that cancellation/timeout is checked
@@ -275,8 +312,6 @@ public class CrossJoinTest extends FoodMartTestCase {
         Assert.assertEquals(0, subList.size());
         Assert.assertEquals(e, s);
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////
     // Mutable List

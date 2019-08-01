@@ -6,7 +6,7 @@
 //
 // Copyright (C) 2004-2005 TONBELLER AG
 // Copyright (C) 2005-2005 Julian Hyde
-// Copyright (C) 2005-2017 Hitachi Vantara and others
+// Copyright (C) 2005-2019 Hitachi Vantara and others
 // All Rights Reserved.
 */
 package mondrian.rolap;
@@ -266,6 +266,9 @@ public abstract class RolapNativeSet extends RolapNative {
                     tr.readTuples(
                         dataSource, partialResult, newPartialResult);
             }
+
+            // Check if result size is already too large
+            Util.preventiveCheckCJResultLimit(result.size());
 
             // Did not get as many members as expected - try to complete using
             // less constraints

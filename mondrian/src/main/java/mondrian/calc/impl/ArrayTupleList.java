@@ -4,13 +4,14 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2017 Hitachi Vantara..  All rights reserved.
+* Copyright (c) 2002-2019 Hitachi Vantara..  All rights reserved.
 */
 
 package mondrian.calc.impl;
 
 import mondrian.calc.*;
 import mondrian.olap.*;
+import mondrian.resource.MondrianResource;
 
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class ArrayTupleList extends AbstractEndToEndTupleList
 {
     private transient Member[] objectData;
     private int size;
+    private static final int cjMaxSize = MondrianProperties.instance().ResultLimit.get();
 
     /**
      * Creates an empty ArrayTupleList with an initial capacity of 10 tuples.
@@ -247,6 +249,11 @@ public class ArrayTupleList extends AbstractEndToEndTupleList
             // Up to next multiple of arity.
             final int rem = newCapacity % arity;
             newCapacity += (arity - rem);
+            if (cjMaxSize > 0 && newCapacity > cjMaxSize) {
+                throw MondrianResource.instance().TotalMembersLimitExceeded.ex(
+                        newCapacity, cjMaxSize);
+            }
+            Util.preventiveCheckCJResultLimit(newCapacity);
             objectData = Util.copyOf(objectData, newCapacity);
         }
     }

@@ -132,6 +132,9 @@ public class Util extends XOMUtil {
      */
     public static final boolean DEBUG = false;
 
+    public static final String WARN = "WARN";
+    public static final String FAIL = "FAIL";
+
     static {
         compatible = new UtilCompatibleJdk16();
     }
@@ -3743,6 +3746,47 @@ public class Util extends XOMUtil {
     }
 
     /**
+     * Check the individual crossjoin results as well as the ArrayTupleList
+     * against the result limit setting. Throws, warns or ignores a
+     * LimitExceededDuringCrossjoin exception if limit exceeded, according
+     * to the ResultLimitMode.
+     *
+     * @param resultSize Result limit
+     * @throws ResourceLimitExceededException
+     */
+    public static void preventiveCheckCJResultLimit( long resultSize) {
+        int resultLimit = MondrianProperties.instance().ResultLimit.get();
+
+        // Throw an exeption, if the size of the crossjoin exceeds the result
+        // limit.
+        if (resultLimit > 0 && resultLimit < resultSize) {
+            if ( MondrianProperties.instance().ResultLimitMode.get().equals( WARN ) ) {
+                LOGGER.warn(
+                        MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
+                                resultSize, resultLimit).getMessage()
+                );
+            } else if ( MondrianProperties.instance().ResultLimitMode.get().equals( FAIL ) ) {
+                throw MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
+                        resultSize, resultLimit);
+            }
+        }
+
+        // Throw an exception if the crossjoin exceeds a reasonable limit.
+        // (Yes, 4 billion is a reasonable limit.)
+        if (resultSize > Integer.MAX_VALUE) {
+            if ( MondrianProperties.instance().ResultLimitMode.get().equals( WARN ) ) {
+                LOGGER.warn(
+                        MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
+                                resultSize, Integer.MAX_VALUE).getMessage()
+                );
+            } else if ( MondrianProperties.instance().ResultLimitMode.get().equals( FAIL ) ) {
+                throw MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
+                        resultSize, Integer.MAX_VALUE);
+            }
+        }
+    }
+
+    /**
      * Check the resultSize against the result limit setting. Throws
      * LimitExceededDuringCrossjoin exception if limit exceeded.
      *
@@ -3761,14 +3805,14 @@ public class Util extends XOMUtil {
         // limit.
         if (resultLimit > 0 && resultLimit < resultSize) {
             throw MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
-                resultSize, resultLimit);
+                        resultSize, resultLimit);
         }
 
         // Throw an exception if the crossjoin exceeds a reasonable limit.
         // (Yes, 4 billion is a reasonable limit.)
         if (resultSize > Integer.MAX_VALUE) {
             throw MondrianResource.instance().LimitExceededDuringCrossjoin.ex(
-                resultSize, Integer.MAX_VALUE);
+                        resultSize, Integer.MAX_VALUE);
         }
     }
 
